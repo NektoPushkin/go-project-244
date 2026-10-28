@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/urfave/cli/v3"
+	cli "github.com/urfave/cli/v3"
 )
 
 // TODO: !!!!Добавьте в README.md аскинему с примером работы пакета.
