@@ -14,33 +14,6 @@ const (
 	fixtureBrokenJSON = "testdata/fixture/json.broken.json"
 )
 
-func TestParseFileBrokenJSON(t *testing.T) {
-	t.Parallel()
-	_, err := parseFile(fixtureBrokenJSON)
-	require.Error(t, err)
-}
-
-func TestParseFile_Flat(t *testing.T) {
-	t.Parallel()
-	color.NoColor = true
-	want := map[string]any{
-		"host":    "hexlet.io",
-		"timeout": float64(50),
-		"proxy":   "123.234.53.22",
-		"follow":  false,
-	}
-
-	got, err := parseFile(fixtureFlatJSON1)
-	require.NoError(t, err)
-	assert.Equal(t, want, got)
-}
-
-func TestParseFileMissingFile(t *testing.T) {
-	t.Parallel()
-	_, err := parseFile("testdata/fixture/file-not-exist.json")
-	assert.Error(t, err)
-}
-
 func TestGenDiffStylish_Flat(t *testing.T) {
 	t.Parallel()
 	color.NoColor = true

@@ -1,19 +1,16 @@
 package code
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"maps"
-	"os"
-	"path/filepath"
 	"reflect"
 	"slices"
 	"strings"
 
 	"github.com/fatih/color"
 
-	yaml "gopkg.in/yaml.v3"
+	"code/parsers"
 )
 
 var (
@@ -24,13 +21,13 @@ var (
 type diff map[string][2]any
 
 func GenDiff(filepath1, filepath2, format string) (string, error) {
-	config1, err := parseFile(filepath1)
+	config1, err := parsers.ParseFile(filepath1)
 
 	if err != nil {
 		return "", err
 	}
 
-	config2, err := parseFile(filepath2)
+	config2, err := parsers.ParseFile(filepath2)
 
 	if err != nil {
 		return "", err
@@ -40,6 +37,22 @@ func GenDiff(filepath1, filepath2, format string) (string, error) {
 		return noDifferenceFound, nil
 	}
 
+	diff := makeDiff(config1, config2)
+
+	var ret string
+	switch format {
+	case "stylish":
+		ret = renderStylish(diff)
+	case "plain":
+		ret = renderPlain(diff)
+	default:
+		return "", ErrUnsupportedFormat
+	}
+
+	return ret, nil
+}
+
+func makeDiff(config1, config2 map[string]any) diff {
 	keys := make([]string, 0, len(config1)+len(config2))
 
 	for k := range config1 {
@@ -57,51 +70,7 @@ func GenDiff(filepath1, filepath2, format string) (string, error) {
 		diff[k] = [2]any{config1[k], config2[k]}
 	}
 
-	var ret string
-	switch format {
-	case "stylish":
-		ret = renderStylish(diff)
-	case "plain":
-		ret = renderPlain(diff)
-	default:
-		return "", ErrUnsupportedFormat
-	}
-
-	return ret, nil
-}
-
-type dataParser func([]byte, any) error
-
-var parsers = map[string]dataParser{
-	"json": json.Unmarshal,
-	"yml":  yaml.Unmarshal,
-	"yaml": yaml.Unmarshal,
-}
-
-func parseFile(path string) (map[string]any, error) {
-	realPath, err := filepath.Abs(path)
-	if err != nil {
-		return nil, err
-	}
-
-	ext := strings.ToLower(strings.TrimPrefix(filepath.Ext(realPath), "."))
-
-	parse, ok := parsers[ext]
-	if !ok {
-		return nil, fmt.Errorf("unsupported config type: %s", path)
-	}
-
-	cont, err := os.ReadFile(realPath)
-	if err != nil {
-		return nil, err
-	}
-
-	var data map[string]any
-	if err := parse(cont, &data); err != nil {
-		return nil, err
-	}
-
-	return data, nil
+	return diff
 }
 
 func renderStylish(diff diff) string {

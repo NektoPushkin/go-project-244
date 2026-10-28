@@ -9,7 +9,7 @@ import (
 	cli "github.com/urfave/cli/v3"
 )
 
-// TODO: !!!!Добавьте в README.md аскинему с примером работы пакета.
+// TODO: !!!!Добавьте в README.md аскинему с примером работы пакета. ++С шага 7
 func main() {
 	cmd := &cli.Command{
 		Name:                   "gendiff",
