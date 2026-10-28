@@ -1,27 +1,18 @@
 .DEFAULT_GOAL := build
 
-BIN_DIR := $(CURDIR)/bin
-export GOBIN := $(BIN_DIR)
-
-GOLANGCI_LINT_VERSION := v2.12.2
-GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
-
-$(GOLANGCI_LINT):
-	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
-
 COVERAGE_MIN := 80
 COVERAGE_FILE := coverage.out
 
-.PHONY: clean lint lint-fix build test test-coverage
+.PHONY: clean lint lint-fix build test-coverage
 
 clean:
 	go clean ./...
 
 lint: clean
-	$(GOLANGCI_LINT) run ./...
+	golangci-lint run ./...
 
 lint-fix: clean
-	$(GOLANGCI_LINT) run --fix ./...
+	golangci-lint run --fix ./...
 
 build: lint-fix
 	go build -o bin/gendiff ./cmd/gendiff
