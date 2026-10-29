@@ -9,62 +9,93 @@ import (
 )
 
 const (
-	fixtureFlatJSON1  = "testdata/fixture/json.flat.1.json"
-	fixtureFlatJSON2  = "testdata/fixture/json.flat.2.json"
+	fixtureJSON1      = "testdata/fixture/json.1.json"
+	fixtureJSON2      = "testdata/fixture/json.2.json"
 	fixtureBrokenJSON = "testdata/fixture/json.broken.json"
+	fixtureYAML1      = "testdata/fixture/yaml.1.yaml"
+	fixtureYAML2      = "testdata/fixture/yaml.2.yml"
+	fixtureBrokenYAML = "testdata/fixture/yaml.broken.yml"
+
+	want = `{
+    common: {
+      + follow: false
+        setting1: Value 1
+      - setting2: 200
+      - setting3: true
+      + setting3: null
+      + setting4: blah blah
+      + setting5: {
+            key5: value5
+        }
+        setting6: {
+            doge: {
+              - wow: 
+              + wow: so much
+            }
+            key: value
+          + ops: vops
+        }
+    }
+    group1: {
+      - baz: bas
+      + baz: bars
+        foo: bar
+      - nest: {
+            key: value
+        }
+      + nest: str
+    }
+  - group2: {
+        abc: 12345
+        deep: {
+            id: 45
+        }
+    }
+  + group3: {
+        deep: {
+            id: {
+                number: 45
+            }
+        }
+        fee: 100500
+    }
+}`
 )
 
-func TestGenDiffStylish_Flat(t *testing.T) {
+func TestGenDiffStylish_JSON(t *testing.T) {
 	t.Parallel()
 	color.NoColor = true
-	const want = `{
-  - follow: false
-  - proxy: 123.234.53.22
-  - timeout: 50
-  + timeout: 20
-  + verbose: true
-}`
 
-	got, err := GenDiff(fixtureFlatJSON1, fixtureFlatJSON2, "stylish")
+	got, err := GenDiff(fixtureJSON1, fixtureJSON2, "stylish")
+	require.NoError(t, err)
+	assert.Equal(t, want, got)
+}
+
+func TestGenDiffStylish_YAML(t *testing.T) {
+	t.Parallel()
+	color.NoColor = true
+
+	got, err := GenDiff(fixtureYAML1, fixtureYAML2, "stylish")
 	require.NoError(t, err)
 	assert.Equal(t, want, got)
 }
 
 func TestGenDiffIdenticalFiles(t *testing.T) {
 	t.Parallel()
-	got, err := GenDiff(fixtureFlatJSON1, fixtureFlatJSON1, "stylish")
+	got, err := GenDiff(fixtureJSON1, fixtureJSON1, "stylish")
 	require.NoError(t, err)
 	assert.Equal(t, noDifferenceFound, got)
 }
 
 func TestGenDiffBrokenInput(t *testing.T) {
 	t.Parallel()
-	_, err := GenDiff(fixtureBrokenJSON, fixtureFlatJSON2, "stylish")
+	_, err := GenDiff(fixtureBrokenJSON, fixtureJSON2, "stylish")
 	assert.Error(t, err)
 }
 
 func TestGenDiffUnknownFormat(t *testing.T) {
 	t.Parallel()
-	got, err := GenDiff(fixtureFlatJSON1, fixtureFlatJSON2, "raw")
+	got, err := GenDiff(fixtureJSON1, fixtureJSON2, "raw")
 	require.ErrorIs(t, err, ErrUnsupportedFormat)
 	assert.Empty(t, got)
-}
-
-func TestRenderStylish_Flat(t *testing.T) {
-	t.Parallel()
-	color.NoColor = true
-	diff := diff{
-		"added":   {nil, true},
-		"removed": {1, nil},
-		"changed": {"was", "now"},
-		"same":    {2, 2},
-	}
-	const want = `{
-  + added: true
-  - changed: was
-  + changed: now
-  - removed: 1
-}`
-
-	assert.Equal(t, want, renderStylish(diff))
 }
