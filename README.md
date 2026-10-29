@@ -16,7 +16,7 @@
 
 ## Стек
 
-- Go (>= 1.27)
+- Go (>= 1.26)
 - Библиотеки: [`urfave/cli/v3`](https://github.com/urfave/cli/v3) (CLI), [`gopkg.in/yaml.v3`](https://github.com/go-yaml/yaml) (YAML), [`fatih/color`](https://github.com/fatih/color) (цвета), [`stretchr/testify`](https://github.com/stretchr/testify) (тесты)
 
 ## Установка
