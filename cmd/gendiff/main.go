@@ -2,6 +2,7 @@ package main
 
 import (
 	"code"
+	"code/formatters"
 	"context"
 	"fmt"
 	"os"
@@ -31,13 +32,10 @@ func main() {
 
 			filepath1, filepath2, format := cmd.Args().Get(0), cmd.Args().Get(1), ""
 
-			switch cmd.String("format") {
-			case "stylish":
-				fallthrough
-			case "plain":
+			if formatters.IsFormatAvailable(cmd.String("format")) {
 				format = cmd.String("format")
-			default:
-				return code.ErrUnsupportedFormat
+			} else {
+				return formatters.ErrUnsupportedFormat
 			}
 
 			ret, err := code.GenDiff(filepath1, filepath2, format)

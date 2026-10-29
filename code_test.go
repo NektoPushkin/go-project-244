@@ -6,6 +6,8 @@ import (
 	"github.com/fatih/color"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"code/formatters"
 )
 
 const (
@@ -16,7 +18,7 @@ const (
 	fixtureYAML2      = "testdata/fixture/yaml.2.yml"
 	fixtureBrokenYAML = "testdata/fixture/yaml.broken.yml"
 
-	want = `{
+	wantOutput = `{
     common: {
       + follow: false
         setting1: Value 1
@@ -68,7 +70,7 @@ func TestGenDiffStylish_JSON(t *testing.T) {
 
 	got, err := GenDiff(fixtureJSON1, fixtureJSON2, "stylish")
 	require.NoError(t, err)
-	assert.Equal(t, want, got)
+	assert.Equal(t, wantOutput, got)
 }
 
 func TestGenDiffStylish_YAML(t *testing.T) {
@@ -77,7 +79,7 @@ func TestGenDiffStylish_YAML(t *testing.T) {
 
 	got, err := GenDiff(fixtureYAML1, fixtureYAML2, "stylish")
 	require.NoError(t, err)
-	assert.Equal(t, want, got)
+	assert.Equal(t, wantOutput, got)
 }
 
 func TestGenDiffIdenticalFiles(t *testing.T) {
@@ -96,6 +98,6 @@ func TestGenDiffBrokenInput(t *testing.T) {
 func TestGenDiffUnknownFormat(t *testing.T) {
 	t.Parallel()
 	got, err := GenDiff(fixtureJSON1, fixtureJSON2, "raw")
-	require.ErrorIs(t, err, ErrUnsupportedFormat)
+	require.ErrorIs(t, err, formatters.ErrUnsupportedFormat)
 	assert.Empty(t, got)
 }
