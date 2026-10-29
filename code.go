@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"slices"
 
-	. "code/formatters"
+	"code/formatters"
 	"code/parsers"
 )
 
@@ -31,10 +31,10 @@ func GenDiff(filepath1, filepath2, format string) (string, error) {
 
 	diff := buildDiffTree(config1, config2)
 
-	return Render(diff, format)
+	return formatters.Render(diff, format)
 }
 
-func buildDiffTree(config1, config2 map[string]any) []*Node {
+func buildDiffTree(config1, config2 map[string]any) []*formatters.Node {
 	keys := make([]string, 0, len(config1)+len(config2))
 
 	for k := range config1 {
@@ -47,7 +47,7 @@ func buildDiffTree(config1, config2 map[string]any) []*Node {
 		}
 	}
 	slices.Sort(keys)
-	nodes := make([]*Node, 0, len(keys))
+	nodes := make([]*formatters.Node, 0, len(keys))
 
 	for _, k := range keys {
 		v1, ok1 := config1[k]
@@ -56,20 +56,20 @@ func buildDiffTree(config1, config2 map[string]any) []*Node {
 		m1, okv1 := v1.(map[string]any)
 		m2, okv2 := v2.(map[string]any)
 
-		node := &Node{K: k, Childs: buildDiffTree(m1, m2), OldVal: v1}
+		node := &formatters.Node{K: k, Childs: buildDiffTree(m1, m2), OldVal: v1}
 		switch {
 		case ok1 && ok2 && reflect.DeepEqual(v1, v2):
-			node.Status = StatusUnchanged
+			node.Status = formatters.StatusUnchanged
 		case ok1 && ok2:
-			node.Status = StatusChanged
+			node.Status = formatters.StatusChanged
 			node.NewVal = v2
 			node.OldSub = okv1
 			node.NewSub = okv2
 		case ok1 && !ok2:
-			node.Status = StatusRemoved
+			node.Status = formatters.StatusRemoved
 			node.NewVal = v2
 		case !ok1 && ok2:
-			node.Status = StatusAdded
+			node.Status = formatters.StatusAdded
 			node.NewVal = v2
 		}
 		nodes = append(nodes, node)
