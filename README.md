@@ -167,7 +167,9 @@ Property 'group3' was added with value: [complex value]
     }
 ]
 ```
+
 [Аскинема с примером использования](https://asciinema.org/a/8ieKiNClvuydEEdC)
+
 ---
 
 <details>
