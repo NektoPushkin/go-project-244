@@ -23,7 +23,7 @@
 
 Требования: Go 1.27+ 
 
-Для `make build`/`make lint` — [`golangci-lint`](https://golangci-lint.run/):
+Для `make build`/`make lint` — требуется [`golangci-lint`](https://golangci-lint.run/):
 
 ```bash
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
