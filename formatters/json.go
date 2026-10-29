@@ -47,22 +47,3 @@ func makeJSONPatchElem(action, path string, val any) patchNode {
 func makeJSONPatchPath(path []string, curr string) string {
 	return "/" + strings.Join(append(append([]string{}, path...), curr), "/")
 }
-
-/*
-{
- {
-    "op": "replace",
-    "path": "/settings/theme",
-    "value": "light"
-  },
-  {
-    "op": "remove",
-    "path": "/settings/notifications"
-  },
-  {
-    "op": "add",
-    "path": "/settings/volume",
-    "value": 100
-  }
-}
-*/

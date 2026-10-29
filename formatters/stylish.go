@@ -70,8 +70,12 @@ func addStylishEntry(sb *strings.Builder, sign, key string, value any, childs []
 }
 
 func formatStylishValue(v any) string {
-	if v == nil {
+	switch v.(type) {
+	case nil:
 		return "null"
+	case float64:
+		return fmt.Sprintf("%g", v)
+	default:
+		return fmt.Sprintf("%v", v)
 	}
-	return fmt.Sprintf("%v", v)
 }
