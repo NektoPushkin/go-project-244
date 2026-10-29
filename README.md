@@ -114,6 +114,8 @@ gendiff [опции] <config1> <config2>
 
 Если файлы идентичны, утилита выводит `no differences found`.
 
+[Аскинема с примером использования](https://asciinema.org/a/fyiA2eoX3ZJtjBYT)
+
 ### Пример: plain
 
 ```bash
@@ -127,6 +129,8 @@ Property 'common.setting3' was updated. From true to null
 Property 'group2' was removed
 Property 'group3' was added with value: [complex value]
 ```
+
+[Аскинема с примером использования](https://asciinema.org/a/9E1c3xRXVRmbYD2f)
 
 ### Пример: json (JSON Patch, RFC 6902)
 
@@ -163,7 +167,7 @@ Property 'group3' was added with value: [complex value]
     }
 ]
 ```
-
+[Аскинема с примером использования](https://asciinema.org/a/8ieKiNClvuydEEdC)
 ---
 
 <details>

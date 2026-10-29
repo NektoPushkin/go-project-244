@@ -71,15 +71,33 @@ Property 'group2' was removed
 Property 'group3' was added with value: [complex value]
 `
 
-func TestRenderStylish(t *testing.T) {
-	got := RenderStylish(sampleTree())
-	assert.Equal(t, wantStylish, got)
-}
-
-func TestRenderPlain(t *testing.T) {
-	got := RenderPlain(sampleTree())
-	assert.Equal(t, wantPlain, got)
-}
+const wantJSON = `[
+    {
+        "op": "add",
+        "path": "/common/follow",
+        "value": false
+    },
+    {
+        "op": "remove",
+        "path": "/common/setting2"
+    },
+    {
+        "op": "replace",
+        "path": "/common/setting3",
+        "value": null
+    },
+    {
+        "op": "remove",
+        "path": "/group2"
+    },
+    {
+        "op": "add",
+        "path": "/group3",
+        "value": {
+            "fee": 100500
+        }
+    }
+]`
 
 func TestRender_Stylish(t *testing.T) {
 	got, err := Render(sampleTree(), "stylish")
@@ -91,10 +109,21 @@ func TestRender_Plain(t *testing.T) {
 	got, err := Render(sampleTree(), "plain")
 	require.NoError(t, err)
 	assert.Equal(t, wantPlain, got)
+
+}
+func TestRender_JSON(t *testing.T) {
+	got, err := Render(sampleTree(), "json")
+	require.NoError(t, err)
+	assert.Equal(t, wantJSON, got)
 }
 
 func TestRender_UnknownFormat(t *testing.T) {
 	got, err := Render(sampleTree(), "raw")
 	assert.ErrorIs(t, err, ErrUnsupportedFormat)
 	assert.Empty(t, got)
+}
+
+func TestRenderJSON(t *testing.T) {
+	got := RenderJSON(sampleTree())
+	assert.Equal(t, wantJSON, got)
 }
