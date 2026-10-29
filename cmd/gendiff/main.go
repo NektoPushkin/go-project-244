@@ -27,7 +27,7 @@ func main() {
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			if cmd.NArg() != 2 {
-				return fmt.Errorf("both files required to be compared")
+				return fmt.Errorf("only two files required to be compared")
 			}
 
 			filepath1, filepath2, format := cmd.Args().Get(0), cmd.Args().Get(1), ""
