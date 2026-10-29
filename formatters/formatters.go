@@ -26,6 +26,7 @@ var (
 	formatters           = Formats{
 		"stylish": RenderStylish,
 		"plain":   RenderPlain,
+		"json":    RenderJSON,
 	}
 )
 

@@ -56,5 +56,3 @@ func formatPlainValue(v any) string {
 		return fmt.Sprintf("%v", v)
 	}
 }
-
-//func addPlainEntry(sb *strings.Builder, format, name string, path []string, n.NewVal any)
