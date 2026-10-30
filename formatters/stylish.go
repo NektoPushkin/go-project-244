@@ -7,29 +7,24 @@ import (
 	"github.com/fatih/color"
 )
 
+var (
+	plusChar  = color.GreenString("+")
+	minusChar = color.RedString("-")
+)
+
 func RenderStylish(diffTree []*Node) string {
 	var sb strings.Builder
 	sb.WriteString("{\n")
 
-	renderStylishLevel(&sb, diffTree, 1, false)
+	renderStylishLevel(&sb, diffTree, 1)
 	sb.WriteString("}")
 
 	return sb.String()
 }
 
-func renderStylishLevel(sb *strings.Builder, nodes []*Node, level int, marked bool) {
-
-	plusChar, minusChar := " ", " "
-	if !marked {
-		plusChar = color.GreenString("+")
-		minusChar = color.RedString("-")
-	}
-
+func renderStylishLevel(sb *strings.Builder, nodes []*Node, level int) {
 	for _, n := range nodes {
 		switch n.Status {
-		case StatusUnchanged:
-			addStylishEntry(sb, " ", n.K, n.OldVal, n.Childs, level)
-
 		case StatusAdded:
 			addStylishEntry(sb, plusChar, n.K, n.NewVal, n.Childs, level)
 
@@ -37,21 +32,13 @@ func renderStylishLevel(sb *strings.Builder, nodes []*Node, level int, marked bo
 			addStylishEntry(sb, minusChar, n.K, n.OldVal, n.Childs, level)
 
 		case StatusChanged:
-			switch {
-			case n.OldSub && n.NewSub: // оба объекты
-				fmt.Fprintf(sb, "%s%s: {\n", strings.Repeat("    ", level), n.K)
-				renderStylishLevel(sb, n.Childs, level+1, marked)
-			case n.OldSub: // перестал быть объектом
-				addStylishEntry(sb, minusChar, n.K, nil, n.Childs, level)
-				addStylishEntry(sb, plusChar, n.K, n.NewVal, nil, level)
-			case n.NewSub: // стал объектом
-				addStylishEntry(sb, minusChar, n.K, n.OldVal, nil, level)
-				addStylishEntry(sb, plusChar, n.K, nil, n.Childs, level)
-			default: // оба не объекты
-				addStylishEntry(sb, minusChar, n.K, n.OldVal, nil, level)
-				addStylishEntry(sb, plusChar, n.K, n.NewVal, nil, level)
-			}
+			addStylishEntry(sb, minusChar, n.K, n.OldVal, nil, level)
+			addStylishEntry(sb, plusChar, n.K, n.NewVal, nil, level)
+
+		default:
+			addStylishEntry(sb, " ", n.K, n.OldVal, n.Childs, level)
 		}
+
 	}
 	if level > 1 {
 		fmt.Fprintf(sb, "%s}\n", strings.Repeat("    ", level-1))
@@ -63,16 +50,25 @@ func addStylishEntry(sb *strings.Builder, sign, key string, value any, childs []
 
 	if len(childs) > 0 {
 		fmt.Fprintf(sb, "%s%s %s: {\n", indent, sign, key)
-		renderStylishLevel(sb, childs, level+1, true)
+		renderStylishLevel(sb, childs, level+1)
 	} else {
-		fmt.Fprintf(sb, "%s%s %s: %s\n", indent, sign, key, formatStylishValue(value))
+		fmt.Fprintf(sb, "%s%s %s: %s\n", indent, sign, key, formatStylishValue(value, level+1))
 	}
 }
 
-func formatStylishValue(v any) string {
-	switch v.(type) {
+func formatStylishValue(v any, level int) string {
+	switch v := v.(type) {
 	case nil:
 		return "null"
+	case map[string]any:
+		var sb strings.Builder
+		sb.WriteString("{\n")
+		for k, v2 := range v {
+			fmt.Fprintf(&sb, "%s%s: %s\n", strings.Repeat("    ", level), k, formatStylishValue(v2, level+1))
+		}
+		sb.WriteString(strings.Repeat("    ", level-1))
+		sb.WriteString("}")
+		return sb.String()
 	case float64:
 		return fmt.Sprintf("%g", v)
 	default:

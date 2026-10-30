@@ -14,15 +14,11 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// sampleTree возвращает дерево, покрывающее все статусы:
-// added, removed, changed (скаляр), unchanged и вложенные объекты.
 func sampleTree() []*Node {
 	return []*Node{
 		{
 			K:      "common",
-			Status: StatusChanged,
-			OldSub: true,
-			NewSub: true,
+			Status: StatusNested,
 			Childs: []*Node{
 				{K: "follow", Status: StatusAdded, NewVal: false},
 				{K: "setting1", Status: StatusUnchanged, OldVal: "Value 1"},
@@ -33,17 +29,12 @@ func sampleTree() []*Node {
 		{
 			K:      "group2",
 			Status: StatusRemoved,
-			Childs: []*Node{
-				{K: "abc", Status: StatusRemoved, OldVal: 12345},
-			},
+			OldVal: map[string]any{"abc": 12345},
 		},
 		{
 			K:      "group3",
 			Status: StatusAdded,
 			NewVal: map[string]any{"fee": 100500},
-			Childs: []*Node{
-				{K: "fee", Status: StatusAdded, NewVal: 100500},
-			},
 		},
 	}
 }
@@ -68,10 +59,9 @@ const wantPlain = `Property 'common.follow' was added with value: false
 Property 'common.setting2' was removed
 Property 'common.setting3' was updated. From true to null
 Property 'group2' was removed
-Property 'group3' was added with value: [complex value]
-`
+Property 'group3' was added with value: [complex value]`
 
-const wantJSON = `[
+const wantJSONPatch = `[
     {
         "op": "add",
         "path": "/common/follow",
@@ -99,6 +89,8 @@ const wantJSON = `[
     }
 ]`
 
+const wantJSON = `{"key":"","type":"root","children":[{"key":"common","type":"nested","children":[{"key":"follow","type":"added","value2":false},{"key":"setting1","type":"unchagned","value1":"Value 1"},{"key":"setting2","type":"deleted","value1":200},{"key":"setting3","type":"changed","value1":true}]},{"key":"group2","type":"deleted","value1":{"abc":12345}},{"key":"group3","type":"added","value2":{"fee":100500}}]}`
+
 func TestRender_Stylish(t *testing.T) {
 	got, err := Render(sampleTree(), "stylish")
 	require.NoError(t, err)
@@ -123,7 +115,7 @@ func TestRender_UnknownFormat(t *testing.T) {
 	assert.Empty(t, got)
 }
 
-func TestRenderJSON(t *testing.T) {
-	got := RenderJSON(sampleTree())
-	assert.Equal(t, wantJSON, got)
+func TestRenderJSONPatch(t *testing.T) {
+	got := RenderJSONPatch(sampleTree())
+	assert.Equal(t, wantJSONPatch, got)
 }

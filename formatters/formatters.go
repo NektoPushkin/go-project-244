@@ -5,28 +5,32 @@ import (
 )
 
 type Node struct {
-	K              string
-	Status         int
-	OldVal, NewVal any
-	OldSub, NewSub bool
-	Childs         []*Node
+	K      string  `json:"key"`
+	Status string  `json:"type"`
+	OldVal any     `json:"value1,omitempty"`
+	NewVal any     `json:"value2,omitempty"`
+	OldSub bool    `json:"-"`
+	NewSub bool    `json:"-"`
+	Childs []*Node `json:"children,omitempty"`
 }
 
 const (
-	StatusAdded int = iota
-	StatusRemoved
-	StatusChanged
-	StatusUnchanged
+	StatusAdded     = "added"
+	StatusRemoved   = "deleted"
+	StatusChanged   = "changed"
+	StatusUnchanged = "unchagned"
+	StatusNested    = "nested"
 )
 
 type Formats map[string]func(diffTree []*Node) string
 
 var (
-	ErrUnsupportedFormat = errors.New("unknown format, expected \"stylish\" or \"plain\"")
+	ErrUnsupportedFormat = errors.New("unsupported format")
 	formatters           = Formats{
-		"stylish": RenderStylish,
-		"plain":   RenderPlain,
-		"json":    RenderJSON,
+		"stylish":   RenderStylish,
+		"plain":     RenderPlain,
+		"json":      RenderJSON,
+		"jsonpatch": RenderJSONPatch,
 	}
 )
 

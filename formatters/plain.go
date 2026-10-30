@@ -23,10 +23,12 @@ func renderPlainLevel(sb *strings.Builder, nodes []*Node, path []string) {
 			fmt.Fprintf(sb, "Property '%s' was added with value: %v\n", nodePath, formatPlainValue(n.NewVal))
 		case StatusRemoved:
 			fmt.Fprintf(sb, "Property '%s' was removed\n", nodePath)
+		case StatusNested:
+			if len(n.Childs) > 0 {
+				renderPlainLevel(sb, n.Childs, append(path, n.K))
+			}
 		case StatusChanged:
 			switch {
-			case n.OldSub && n.NewSub: // оба объекты
-				renderPlainLevel(sb, n.Childs, append(path, n.K))
 			case n.OldSub: // перестал быть объектом
 				fmt.Fprintf(sb, "Property '%s' was updated. From [complex value] to %s\n", nodePath, formatPlainValue(n.NewVal))
 			case n.NewSub: // стал объектом

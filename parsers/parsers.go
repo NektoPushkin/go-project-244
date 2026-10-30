@@ -18,7 +18,7 @@ var parsers = map[string]dataParser{
 	"yaml": yaml.Unmarshal,
 }
 
-// ParseFile читает файл конфигурации и разбирает его содержимое
+// ParseFile читает файлы конфигураций разбирает их
 // в зависимости от расширения (json, yml, yaml).
 func ParseFile(path string) (map[string]any, error) {
 	realPath, err := filepath.Abs(path)

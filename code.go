@@ -30,7 +30,6 @@ func GenDiff(filepath1, filepath2, format string) (string, error) {
 	}
 
 	diff := buildDiffTree(config1, config2)
-
 	return formatters.Render(diff, format)
 }
 
@@ -53,26 +52,28 @@ func buildDiffTree(config1, config2 map[string]any) []*formatters.Node {
 		v1, ok1 := config1[k]
 		v2, ok2 := config2[k]
 
-		m1, okv1 := v1.(map[string]any)
-		m2, okv2 := v2.(map[string]any)
+		m1, isMap1 := v1.(map[string]any)
+		m2, isMap2 := v2.(map[string]any)
 
-		node := &formatters.Node{K: k, Childs: buildDiffTree(m1, m2), OldVal: v1}
 		switch {
-		case ok1 && ok2 && reflect.DeepEqual(v1, v2):
-			node.Status = formatters.StatusUnchanged
 		case ok1 && ok2:
-			node.Status = formatters.StatusChanged
-			node.NewVal = v2
-			node.OldSub = okv1
-			node.NewSub = okv2
+			switch {
+			case isMap1 && isMap2:
+				nodes = append(nodes, &formatters.Node{K: k, Status: formatters.StatusNested, Childs: buildDiffTree(m1, m2)})
+			case isMap1 || isMap2:
+				nodes = append(nodes, &formatters.Node{K: k, Status: formatters.StatusChanged, OldVal: v1, NewVal: v2, NewSub: isMap2, OldSub: isMap1})
+			default:
+				if v1 != v2 {
+					nodes = append(nodes, &formatters.Node{K: k, Status: formatters.StatusChanged, OldVal: v1, NewVal: v2})
+				} else {
+					nodes = append(nodes, &formatters.Node{K: k, Status: formatters.StatusUnchanged, OldVal: v1})
+				}
+			}
 		case ok1 && !ok2:
-			node.Status = formatters.StatusRemoved
-			node.NewVal = v2
+			nodes = append(nodes, &formatters.Node{K: k, Status: formatters.StatusRemoved, OldVal: v1})
 		case !ok1 && ok2:
-			node.Status = formatters.StatusAdded
-			node.NewVal = v2
+			nodes = append(nodes, &formatters.Node{K: k, Status: formatters.StatusAdded, NewVal: v2})
 		}
-		nodes = append(nodes, node)
 	}
 
 	return nodes
