@@ -2,6 +2,8 @@ package formatters
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 	"strings"
 
 	"github.com/fatih/color"
@@ -63,8 +65,8 @@ func formatStylishValue(v any, level int) string {
 	case map[string]any:
 		var sb strings.Builder
 		sb.WriteString("{\n")
-		for k, v2 := range v {
-			fmt.Fprintf(&sb, "%s%s: %s\n", strings.Repeat("    ", level), k, formatStylishValue(v2, level+1))
+		for _, k := range slices.Sorted(maps.Keys(v)) {
+			fmt.Fprintf(&sb, "%s%s: %s\n", strings.Repeat("    ", level), k, formatStylishValue(v[k], level+1))
 		}
 		sb.WriteString(strings.Repeat("    ", level-1))
 		sb.WriteString("}")
