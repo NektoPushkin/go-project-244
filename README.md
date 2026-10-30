@@ -11,7 +11,7 @@
 ## Возможности
 
 - Сравнение **вложенных** структур произвольной глубины (JSON и YAML);
-- Три формата вывода: `stylish` (по умолчанию), `plain` и `json` (JSON Patch по [RFC 6902]);
+- Четыре формата вывода: `stylish` (по умолчанию), `plain`, `json` (плоское JSON-дерево отличий) и `jsonpatch` (JSON Patch по [RFC 6902]);
 - Порог покрытия тестами при сборке и автопроверки в GitHub Actions.
 
 ## Стек
@@ -57,7 +57,7 @@ gendiff [опции] <config1> <config2>
 Поддерживаемые расширения файлов: `.json`, `.yml`, `.yaml`.
 
 Возможные опции:
-   --format, -f      формат вывода: `stylish`, `plain`, `json` (по умолчанию: `stylish`)
+   --format, -f      формат вывода: `stylish`, `plain`, `json`, `jsonpatch` (по умолчанию: `stylish`)
 
 ### Пример: stylish (по умолчанию)
 
@@ -132,10 +132,22 @@ Property 'group3' was added with value: [complex value]
 
 [Аскинема с примером использования](https://asciinema.org/a/9E1c3xRXVRmbYD2f)
 
-### Пример: json (JSON Patch, RFC 6902)
+### Пример: json (дерево отличий)
 
 ```bash
 ./bin/gendiff --format=json testdata/fixture/json.1.json testdata/fixture/json.2.json
+```
+
+```json
+{"key":"","type":"root","children":[{"key":"common","type":"nested","children":[{"key":"follow","type":"added","value2":false},{"key":"setting1","type":"unchagned","value1":"Value 1"},{"key":"setting2","type":"deleted","value1":200},{"key":"setting3","type":"changed","value1":true},{"key":"setting4","type":"added","value2":"blah blah"},{"key":"setting5","type":"added","value2":{"key5":"value5"}},{"key":"setting6","type":"nested","children":[{"key":"doge","type":"nested","children":[{"key":"wow","type":"changed","value1":"","value2":"so much"}]},{"key":"key","type":"unchagned","value1":"value"},{"key":"ops","type":"added","value2":"vops"}]}]},{"key":"group1","type":"nested","children":[{"key":"baz","type":"changed","value1":"bas","value2":"bars"},{"key":"foo","type":"unchagned","value1":"bar"},{"key":"nest","type":"changed","value1":{"key":"value"},"value2":"str"}]},{"key":"group2","type":"deleted","value1":{"abc":12345,"deep":{"id":45}}},{"key":"group3","type":"added","value2":{"deep":{"id":{"number":45}},"fee":100500}}]}
+```
+
+[Аскинема с примером использования](https://asciinema.org/a/magN9RhIC8gYx8IE)
+
+### Пример: jsonpatch (JSON Patch, RFC 6902)
+
+```bash
+./bin/gendiff --format=jsonpatch testdata/fixture/json.1.json testdata/fixture/json.2.json
 ```
 
 ```json
@@ -168,7 +180,7 @@ Property 'group3' was added with value: [complex value]
 ]
 ```
 
-[Аскинема с примером использования](https://asciinema.org/a/8ieKiNClvuydEEdC)
+[Аскинема с примером использования](https://asciinema.org/a/T80YUoCU9hYc1DNB)
 
 ---
 
