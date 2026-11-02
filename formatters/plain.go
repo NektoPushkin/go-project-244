@@ -5,10 +5,10 @@ import (
 	"strings"
 )
 
-func RenderPlain(diffTree []*Node) string {
+func RenderPlain(diffTree []*Node) (string, error) {
 	var sb strings.Builder
 	renderPlainLevel(&sb, diffTree, make([]string, 0))
-	return strings.TrimSpace(sb.String())
+	return strings.TrimSpace(sb.String()), nil
 }
 
 func renderPlainLevel(sb *strings.Builder, nodes []*Node, path []string) {
@@ -45,6 +45,8 @@ func formatPlainValue(v any) string {
 	case nil:
 		return "null"
 	case map[string]any:
+		return "[complex value]"
+	case []any:
 		return "[complex value]"
 	case string:
 		return fmt.Sprintf("'%s'", v)

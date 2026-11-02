@@ -7,12 +7,9 @@ import (
 
 type patchNode map[string]any
 
-func RenderJSONPatch(diffTree []*Node) string {
+func RenderJSONPatch(diffTree []*Node) (string, error) {
 	jOut, err := json.MarshalIndent(buildJSONPatchStruct(diffTree, nil), "", "    ")
-	if err != nil {
-		return "" //гасим ошибку для совместимости
-	}
-	return string(jOut)
+	return string(jOut), err
 }
 
 func buildJSONPatchStruct(nodes []*Node, path []string) []patchNode {
@@ -44,6 +41,12 @@ func makeJSONPatchElem(action, path string, val any) patchNode {
 	return pn
 }
 
+var jsonPointerEscaper = strings.NewReplacer("~", "~0", "/", "~1")
+
 func makeJSONPatchPath(path []string, curr string) string {
-	return "/" + strings.Join(append(append([]string{}, path...), curr), "/")
+	tokens := append(append([]string{}, path...), curr)
+	for i, tok := range tokens {
+		tokens[i] = jsonPointerEscaper.Replace(tok)
+	}
+	return "/" + strings.Join(tokens, "/")
 }

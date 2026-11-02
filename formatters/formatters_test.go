@@ -89,7 +89,7 @@ const wantJSONPatch = `[
     }
 ]`
 
-const wantJSON = `{"key":"","type":"root","children":[{"key":"common","type":"nested","children":[{"key":"follow","type":"added","value2":false},{"key":"setting1","type":"unchagned","value1":"Value 1"},{"key":"setting2","type":"deleted","value1":200},{"key":"setting3","type":"changed","value1":true}]},{"key":"group2","type":"deleted","value1":{"abc":12345}},{"key":"group3","type":"added","value2":{"fee":100500}}]}`
+const wantJSON = `{"key":"","type":"root","children":[{"key":"common","type":"nested","children":[{"key":"follow","type":"added","value2":false},{"key":"setting1","type":"unchanged","value1":"Value 1"},{"key":"setting2","type":"deleted","value1":200},{"key":"setting3","type":"changed","value1":true}]},{"key":"group2","type":"deleted","value1":{"abc":12345}},{"key":"group3","type":"added","value2":{"fee":100500}}]}`
 
 func TestRender_Stylish(t *testing.T) {
 	got, err := Render(sampleTree(), "stylish")
@@ -116,6 +116,7 @@ func TestRender_UnknownFormat(t *testing.T) {
 }
 
 func TestRenderJSONPatch(t *testing.T) {
-	got := RenderJSONPatch(sampleTree())
+	got, err := RenderJSONPatch(sampleTree())
+	require.NoError(t, err)
 	assert.Equal(t, wantJSONPatch, got)
 }

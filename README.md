@@ -112,8 +112,6 @@ gendiff [опции] <config1> <config2>
 }
 ```
 
-Если файлы идентичны, утилита выводит `no differences found`.
-
 [Аскинема с примером использования](https://asciinema.org/a/fyiA2eoX3ZJtjBYT)
 
 ### Пример: plain

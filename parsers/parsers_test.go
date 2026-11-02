@@ -65,7 +65,7 @@ func TestParseFile_YAML(t *testing.T) {
 	want := map[string]any{
 		"common": map[string]any{
 			"setting1": "Value 1",
-			"setting2": 200,
+			"setting2": float64(200),
 			"setting3": true,
 			"setting6": map[string]any{
 				"key": "value",
@@ -82,9 +82,9 @@ func TestParseFile_YAML(t *testing.T) {
 			},
 		},
 		"group2": map[string]any{
-			"abc": 12345,
+			"abc": float64(12345),
 			"deep": map[string]any{
-				"id": 45,
+				"id": float64(45),
 			},
 		},
 	}

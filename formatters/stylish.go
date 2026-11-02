@@ -14,47 +14,41 @@ var (
 	minusChar = color.RedString("-")
 )
 
-func RenderStylish(diffTree []*Node) string {
+func RenderStylish(diffTree []*Node) (string, error) {
 	var sb strings.Builder
 	sb.WriteString("{\n")
 
 	renderStylishLevel(&sb, diffTree, 1)
 	sb.WriteString("}")
 
-	return sb.String()
+	return sb.String(), nil
 }
 
 func renderStylishLevel(sb *strings.Builder, nodes []*Node, level int) {
+	indent := strings.Repeat("    ", level-1) + "  "
 	for _, n := range nodes {
 		switch n.Status {
+		case StatusUnchanged:
+			fmt.Fprintf(sb, "%s  %s: %s\n", indent, n.K, formatStylishValue(n.OldVal, level+1))
+
+		case StatusNested:
+			fmt.Fprintf(sb, "%s  %s: {\n", indent, n.K)
+			renderStylishLevel(sb, n.Childs, level+1)
+
 		case StatusAdded:
-			addStylishEntry(sb, plusChar, n.K, n.NewVal, n.Childs, level)
+			fmt.Fprintf(sb, "%s%s %s: %s\n", indent, plusChar, n.K, formatStylishValue(n.NewVal, level+1))
 
 		case StatusRemoved:
-			addStylishEntry(sb, minusChar, n.K, n.OldVal, n.Childs, level)
+			fmt.Fprintf(sb, "%s%s %s: %s\n", indent, minusChar, n.K, formatStylishValue(n.OldVal, level+1))
 
 		case StatusChanged:
-			addStylishEntry(sb, minusChar, n.K, n.OldVal, nil, level)
-			addStylishEntry(sb, plusChar, n.K, n.NewVal, nil, level)
-
-		default:
-			addStylishEntry(sb, " ", n.K, n.OldVal, n.Childs, level)
+			fmt.Fprintf(sb, "%s%s %s: %s\n", indent, minusChar, n.K, formatStylishValue(n.OldVal, level+1))
+			fmt.Fprintf(sb, "%s%s %s: %s\n", indent, plusChar, n.K, formatStylishValue(n.NewVal, level+1))
 		}
 
 	}
 	if level > 1 {
 		fmt.Fprintf(sb, "%s}\n", strings.Repeat("    ", level-1))
-	}
-}
-
-func addStylishEntry(sb *strings.Builder, sign, key string, value any, childs []*Node, level int) {
-	indent := strings.Repeat("    ", level-1) + "  "
-
-	if len(childs) > 0 {
-		fmt.Fprintf(sb, "%s%s %s: {\n", indent, sign, key)
-		renderStylishLevel(sb, childs, level+1)
-	} else {
-		fmt.Fprintf(sb, "%s%s %s: %s\n", indent, sign, key, formatStylishValue(value, level+1))
 	}
 }
 

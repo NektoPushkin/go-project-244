@@ -18,11 +18,11 @@ const (
 	StatusAdded     = "added"
 	StatusRemoved   = "deleted"
 	StatusChanged   = "changed"
-	StatusUnchanged = "unchagned"
+	StatusUnchanged = "unchanged"
 	StatusNested    = "nested"
 )
 
-type Formats map[string]func(diffTree []*Node) string
+type Formats map[string]func(diffTree []*Node) (string, error)
 
 var (
 	ErrUnsupportedFormat = errors.New("unsupported format")
@@ -36,7 +36,7 @@ var (
 
 func Render(diffTree []*Node, format string) (string, error) {
 	if formatterFunc, ok := formatters[format]; ok {
-		return formatterFunc(diffTree), nil
+		return formatterFunc(diffTree)
 	}
 	return "", ErrUnsupportedFormat
 }

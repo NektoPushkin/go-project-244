@@ -1,6 +1,7 @@
 package code
 
 import (
+	"os"
 	"testing"
 
 	"github.com/fatih/color"
@@ -9,6 +10,11 @@ import (
 
 	"code/formatters"
 )
+
+func TestMain(m *testing.M) {
+	color.NoColor = true
+	os.Exit(m.Run())
+}
 
 const (
 	fixtureJSON1      = "testdata/fixture/json.1.json"
@@ -66,8 +72,6 @@ const (
 
 func TestGenDiffStylish_JSON(t *testing.T) {
 	t.Parallel()
-	color.NoColor = true
-
 	got, err := GenDiff(fixtureJSON1, fixtureJSON2, "stylish")
 	require.NoError(t, err)
 	assert.Equal(t, wantOutput, got)
@@ -75,8 +79,6 @@ func TestGenDiffStylish_JSON(t *testing.T) {
 
 func TestGenDiffStylish_YAML(t *testing.T) {
 	t.Parallel()
-	color.NoColor = true
-
 	got, err := GenDiff(fixtureYAML1, fixtureYAML2, "stylish")
 	require.NoError(t, err)
 	assert.Equal(t, wantOutput, got)
@@ -84,9 +86,9 @@ func TestGenDiffStylish_YAML(t *testing.T) {
 
 func TestGenDiffIdenticalFiles(t *testing.T) {
 	t.Parallel()
-	got, err := GenDiff(fixtureJSON1, fixtureJSON1, "stylish")
+	got, err := GenDiff(fixtureJSON1, fixtureJSON1, "plain")
 	require.NoError(t, err)
-	assert.Equal(t, noDifferenceFound, got)
+	assert.Equal(t, "", got)
 }
 
 func TestGenDiffBrokenInput(t *testing.T) {

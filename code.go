@@ -8,10 +8,6 @@ import (
 	"code/parsers"
 )
 
-var (
-	noDifferenceFound = "no differences found"
-)
-
 func GenDiff(filepath1, filepath2, format string) (string, error) {
 	config1, err := parsers.ParseFile(filepath1)
 
@@ -23,10 +19,6 @@ func GenDiff(filepath1, filepath2, format string) (string, error) {
 
 	if err != nil {
 		return "", err
-	}
-
-	if reflect.DeepEqual(config1, config2) {
-		return noDifferenceFound, nil
 	}
 
 	diff := buildDiffTree(config1, config2)
@@ -63,7 +55,7 @@ func buildDiffTree(config1, config2 map[string]any) []*formatters.Node {
 			case isMap1 || isMap2:
 				nodes = append(nodes, &formatters.Node{K: k, Status: formatters.StatusChanged, OldVal: v1, NewVal: v2, NewSub: isMap2, OldSub: isMap1})
 			default:
-				if v1 != v2 {
+				if !reflect.DeepEqual(v1, v2) {
 					nodes = append(nodes, &formatters.Node{K: k, Status: formatters.StatusChanged, OldVal: v1, NewVal: v2})
 				} else {
 					nodes = append(nodes, &formatters.Node{K: k, Status: formatters.StatusUnchanged, OldVal: v1})
