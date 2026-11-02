@@ -11,11 +11,6 @@ import (
 	"code/formatters"
 )
 
-func TestMain(m *testing.M) {
-	color.NoColor = true
-	os.Exit(m.Run())
-}
-
 const (
 	fixtureJSON1      = "testdata/fixture/json.1.json"
 	fixtureJSON2      = "testdata/fixture/json.2.json"
@@ -69,6 +64,11 @@ const (
     }
 }`
 )
+
+func TestMain(m *testing.M) {
+	color.NoColor = true
+	os.Exit(m.Run())
+}
 
 func TestGenDiffStylish_JSON(t *testing.T) {
 	t.Parallel()
