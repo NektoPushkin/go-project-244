@@ -1,6 +1,8 @@
 package parsers
 
 import (
+	"encoding/json"
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +33,7 @@ func TestParseFile_JSON(t *testing.T) {
 	want := map[string]any{
 		"common": map[string]any{
 			"setting1": "Value 1",
-			"setting2": float64(200),
+			"setting2": int64(200),
 			"setting3": true,
 			"setting6": map[string]any{
 				"key": "value",
@@ -48,9 +50,9 @@ func TestParseFile_JSON(t *testing.T) {
 			},
 		},
 		"group2": map[string]any{
-			"abc": float64(12345),
+			"abc": int64(12345),
 			"deep": map[string]any{
-				"id": float64(45),
+				"id": int64(45),
 			},
 		},
 	}
@@ -65,7 +67,7 @@ func TestParseFile_YAML(t *testing.T) {
 	want := map[string]any{
 		"common": map[string]any{
 			"setting1": "Value 1",
-			"setting2": float64(200),
+			"setting2": int64(200),
 			"setting3": true,
 			"setting6": map[string]any{
 				"key": "value",
@@ -82,9 +84,9 @@ func TestParseFile_YAML(t *testing.T) {
 			},
 		},
 		"group2": map[string]any{
-			"abc": float64(12345),
+			"abc": int64(12345),
 			"deep": map[string]any{
-				"id": float64(45),
+				"id": int64(45),
 			},
 		},
 	}
@@ -98,4 +100,35 @@ func TestParseFileMissingFile(t *testing.T) {
 	t.Parallel()
 	_, err := ParseFile("../testdata/fixture/file-not-exist.json")
 	assert.Error(t, err)
+}
+
+func TestNormalizeNumbers(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		name string
+		in   any
+		want any
+	}{
+		{"jsonNumber_int", json.Number("42"), int64(42)},
+		{"jsonNumber_float", json.Number("1.5"), 1.5},
+		{"jsonNumber_uint64", json.Number("18446744073709551615"), uint64(math.MaxUint64)},
+		{"int", 42, int64(42)},
+		{"uint64_small", uint64(42), int64(42)},
+		{"uint64_max", uint64(math.MaxUint64), uint64(math.MaxUint64)},
+		{"float_pass", 1.5, 1.5},
+		{"string_pass", "text", "text"},
+		{"bool_pass", true, true},
+		{"nil_pass", nil, nil},
+		{
+			"nested",
+			map[string]any{"a": []any{uint64(7), map[string]any{"b": json.Number("1.25")}}},
+			map[string]any{"a": []any{int64(7), map[string]any{"b": 1.25}}},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, normalizeNumbers(tc.in))
+		})
+	}
 }
