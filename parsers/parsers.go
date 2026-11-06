@@ -1,10 +1,13 @@
 package parsers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	yaml "gopkg.in/yaml.v3"
@@ -13,7 +16,7 @@ import (
 type dataParser func([]byte, any) error
 
 var parsers = map[string]dataParser{
-	"json": json.Unmarshal,
+	"json": parseJSON,
 	"yml":  yaml.Unmarshal,
 	"yaml": yaml.Unmarshal,
 }
@@ -50,6 +53,12 @@ func ParseFile(path string) (map[string]any, error) {
 	return data, nil
 }
 
+func parseJSON(b []byte, dst any) error {
+	decoder := json.NewDecoder(bytes.NewReader(b))
+	decoder.UseNumber()
+	return decoder.Decode(dst)
+}
+
 func normalizeNumbers(v any) any {
 	switch v := v.(type) {
 	case map[string]any:
@@ -62,8 +71,22 @@ func normalizeNumbers(v any) any {
 			v[i] = normalizeNumbers(val)
 		}
 		return v
+	case json.Number: //json
+		if i, err := v.Int64(); err == nil {
+			return i
+		}
+		if u, err := strconv.ParseUint(v.String(), 10, 64); err == nil {
+			return u
+		}
+		f, _ := v.Float64()
+		return f
 	case int:
-		return float64(v)
+		return int64(v)
+	case uint64:
+		if v <= math.MaxInt64 {
+			return int64(v)
+		}
+		return v
 	default:
 		return v
 	}

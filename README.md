@@ -1,8 +1,6 @@
 # Вычислитель отличий на Go
 
-[![hexlet-check](https://github.com/NektoPushkin/go-project-244/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/NektoPushkin/go-project-244/actions)
-
-[![gendiff-tests](https://github.com/NektoPushkin/go-project-244/actions/workflows/gendiff-tests.yml/badge.svg)](https://github.com/NektoPushkin/go-project-244/actions/workflows/gendiff-tests.yml)
+| [![hexlet-check](https://github.com/NektoPushkin/go-project-244/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/NektoPushkin/go-project-244/actions)|[![gendiff-tests](https://github.com/NektoPushkin/go-project-244/actions/workflows/gendiff-tests.yml/badge.svg)](https://github.com/NektoPushkin/go-project-244/actions/workflows/gendiff-tests.yml)|
 
 Консольная утилита для сравнения вложенных структур (JSON, YAML)
 
