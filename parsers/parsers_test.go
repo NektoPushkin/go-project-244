@@ -116,6 +116,7 @@ func TestNormalizeNumbers(t *testing.T) {
 		{"uint64_small", uint64(42), int64(42)},
 		{"uint64_max", uint64(math.MaxUint64), uint64(math.MaxUint64)},
 		{"float_pass", 1.5, 1.5},
+		{"float_huge", json.Number("2e400"), "2e400"},
 		{"string_pass", "text", "text"},
 		{"bool_pass", true, true},
 		{"nil_pass", nil, nil},

@@ -3,7 +3,9 @@ package parsers
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"math"
 	"os"
 	"path/filepath"
@@ -56,7 +58,18 @@ func ParseFile(path string) (map[string]any, error) {
 func parseJSON(b []byte, dst any) error {
 	decoder := json.NewDecoder(bytes.NewReader(b))
 	decoder.UseNumber()
-	return decoder.Decode(dst)
+	if err := decoder.Decode(dst); err != nil {
+		return err
+	}
+
+	if err := decoder.Decode(new(any)); !errors.Is(err, io.EOF) {
+		if err == nil {
+			return errors.New("unexpected data after JSON value")
+		}
+		return err
+	}
+
+	return nil
 }
 
 func normalizeNumbers(v any) any {
@@ -78,8 +91,11 @@ func normalizeNumbers(v any) any {
 		if u, err := strconv.ParseUint(v.String(), 10, 64); err == nil {
 			return u
 		}
-		f, _ := v.Float64()
-		return f
+		if f, err := strconv.ParseFloat(v.String(), 10); err == nil {
+			return f
+		} else {
+			return v.String()
+		}
 	case int:
 		return int64(v)
 	case uint64:
