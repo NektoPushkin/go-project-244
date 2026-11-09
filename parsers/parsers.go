@@ -91,7 +91,7 @@ func normalizeNumbers(v any) any {
 		if u, err := strconv.ParseUint(v.String(), 10, 64); err == nil {
 			return u
 		}
-		if f, err := strconv.ParseFloat(v.String(), 10); err == nil {
+		if f, err := strconv.ParseFloat(v.String(), 64); err == nil {
 			return f
 		} else {
 			return v.String()
